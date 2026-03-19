@@ -18,29 +18,30 @@ const Header = () => {
 
   useEffect(() => {
     const currentWord = words[wordIndex];
-    let timeout;
-
-    if (!isDeleting) {
-      timeout = setTimeout(() => {
-        setText(currentWord.slice(0, text.length + 1));
-      }, 80);
-
-      if (text === currentWord) {
-        timeout = setTimeout(() => setIsDeleting(true), 1200);
-      }
-    } else {
-      timeout = setTimeout(() => {
-        setText(currentWord.slice(0, text.length - 1));
-      }, 40);
-
-      if (text === "") {
-        timeout = setTimeout(() => {
+    
+    const handleType = () => {
+      if (!isDeleting) {
+        // Typing
+        if (text !== currentWord) {
+          setText(currentWord.slice(0, text.length + 1));
+        } else {
+          // Pause before deleting
+          timeout = setTimeout(() => setIsDeleting(true), 2000);
+          return;
+        }
+      } else {
+        // Deleting
+        if (text !== "") {
+          setText(currentWord.slice(0, text.length - 1));
+        } else {
           setIsDeleting(false);
           setWordIndex((prev) => (prev + 1) % words.length);
-        }, 50);
+          return;
+        }
       }
-    }
+    };
 
+    let timeout = setTimeout(handleType, isDeleting ? 50 : 100);
     return () => clearTimeout(timeout);
   }, [text, isDeleting, wordIndex]);
 
