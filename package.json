@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@photon-ai/imessage-kit": "^2.1.2",
+    "@supabase/supabase-js": "^2.99.2",
     "dotenv": "^17.3.1",
     "framer-motion": "^12.38.0",
     "groq-sdk": "^1.1.1",
