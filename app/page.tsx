@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -42,9 +43,12 @@ export default function Home() {
                   Join 10,000+ users who have turned their procrastination into
                   a streak of completed tasks.
                 </p>
-                <button className="bg-white text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl hover:scale-105 transition-transform active:scale-95 shadow-2xl">
+                <Link
+                  href="/chat"
+                  className="bg-white text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl inline-block hover:scale-105 transition-transform active:scale-95 shadow-2xl"
+                >
                   Text Done. Now
-                </button>
+                </Link>
               </div>
               <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
