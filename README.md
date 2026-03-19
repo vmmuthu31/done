@@ -112,15 +112,15 @@ $ pnpm agent
 ║  AI-Powered Task Automation on Mac  ║
 ╚════════════════════════════════════╝
 
-[v0] Initializing Done. Agent...
-[v0] Agent fully started and listening...
+[done.] Initializing Done. Agent...
+[done.] Agent fully started and listening...
 
 agent> demo
-[v0] Running demo conversation...
+[done.] Running demo conversation...
 
 [Demo] From +1-555-123-4567: "Write a blog post about AI, do research, and get feedback"
-[v0] Processing message with AI...
-[v0] Decomposing task...
+[done.] Processing message with AI...
+[done.] Decomposing task...
 
 agent> tasks
 Tasks by User:
@@ -130,7 +130,7 @@ Tasks by User:
   • Write a blog post about AI (0/3 steps) [pending]
 
 agent> exit
-[v0] Shutting down...
+[done.] Shutting down...
 ```
 
 ## Usage in Production
@@ -253,11 +253,11 @@ agent> followups
 
 ### Debugging
 
-Enable debug logging by checking the console output. All `console.log("[v0] ...")` statements are debug outputs.
+Enable debug logging by checking the console output. All `console.log("[done.] ...")` statements are debug outputs.
 
 ## License
 
-MIT - Created with v0 for Vercel
+MIT
 
 ## Support
 

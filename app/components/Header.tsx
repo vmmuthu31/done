@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
 
+const words = ["Done.", "Doing.", "Scheduled.", "Completed."];
+
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const words = ["Done.", "Doing.", "Scheduled.", "Completed."];
   const [text, setText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,9 +33,10 @@ const Header = () => {
       }, 40);
 
       if (text === "") {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsDeleting(false);
-        setWordIndex((prev) => (prev + 1) % words.length);
+        timeout = setTimeout(() => {
+          setIsDeleting(false);
+          setWordIndex((prev) => (prev + 1) % words.length);
+        }, 50);
       }
     }
 
