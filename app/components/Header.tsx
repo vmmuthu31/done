@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
+import Link from "next/link";
 
 const words = ["Done.", "Doing.", "Scheduled.", "Completed."];
 
@@ -57,7 +58,7 @@ const Header = () => {
             <MessageSquare className="text-white w-6 h-6" />
           </div>
           <span className="text-2xl font-bold tracking-tight font-mono">
-            <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-[length:200%_200%] bg-clip-text text-transparent animate-gradient">
+            <span className="bg-linear-to-r from-purple-500 via-pink-500 to-red-500 bg-size-[200%_200%] bg-clip-text text-transparent animate-gradient">
               {text}
             </span>
             <span className="ml-1 border-r-2 border-slate-900 animate-blink"></span>
@@ -77,9 +78,12 @@ const Header = () => {
           >
             Features
           </a>
-          <button className="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform active:scale-95">
+          <Link
+            href="/chat"
+            className="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform active:scale-95"
+          >
             Get Started
-          </button>
+          </Link>
         </nav>
 
         <button className="md:hidden text-slate-900">

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -28,9 +29,12 @@ const Hero = () => {
             it, and follows up until it’s completed. No apps, no friction.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all hover:shadow-xl hover:-translate-y-1">
+            <Link
+              href="/chat"
+              className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all hover:shadow-xl hover:-translate-y-1"
+            >
               Text Done. <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
             <button className="bg-white border border-slate-200 text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all">
               See how it works
             </button>
@@ -43,7 +47,7 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative"
         >
-          <div className="relative z-10 bg-white rounded-[3rem] p-4 shadow-2xl border-[8px] border-slate-900 max-w-[380px] mx-auto">
+          <div className="relative z-10 bg-white rounded-[3rem] p-4 shadow-2xl border-8 border-slate-900 max-w-[380px] mx-auto">
             <div className="bg-slate-50 rounded-[2.5rem] h-[600px] overflow-hidden flex flex-col">
               <div className="bg-white/80 backdrop-blur-sm p-4 border-b border-slate-200 flex flex-col items-center">
                 <div className="w-10 h-10 bg-slate-200 rounded-full mb-1 flex items-center justify-center text-slate-500 font-bold">
