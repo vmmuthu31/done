@@ -1,9 +1,5 @@
--- Done. — Supabase Schema
--- Run this in: Supabase Dashboard → SQL Editor → New Query
-
 create extension if not exists "pgcrypto";
 
--- Tasks table
 create table if not exists public.tasks (
   id                  uuid primary key default gen_random_uuid(),
   user_identifier     text not null,
@@ -30,7 +26,6 @@ create index if not exists tasks_followup_idx
   on public.tasks (next_followup_at)
   where status in ('pending', 'in_progress') and next_followup_at is not null;
 
--- Conversations table
 create table if not exists public.conversations (
   id              uuid primary key default gen_random_uuid(),
   user_identifier text not null,
@@ -47,10 +42,20 @@ create index if not exists conversations_user_idx
 alter table public.tasks        enable row level security;
 alter table public.conversations enable row level security;
 
--- Permissive policies so the anon key can read/write
--- (tighten these when you add real auth)
+drop policy if exists "anon full access on tasks"         on public.tasks;
+drop policy if exists "anon full access on conversations" on public.conversations;
+
 create policy "anon full access on tasks"
-  on public.tasks for all using (true) with check (true);
+  on public.tasks for all
+  to anon, authenticated
+  using (true) with check (true);
 
 create policy "anon full access on conversations"
-  on public.conversations for all using (true) with check (true);
+  on public.conversations for all
+  to anon, authenticated
+  using (true) with check (true);
+
+grant usage on schema public to anon, authenticated;
+grant all on public.tasks         to anon, authenticated;
+grant all on public.conversations to anon, authenticated;
+
