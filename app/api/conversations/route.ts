@@ -25,12 +25,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const tasks = await db.getActiveTasksForUser(userId);
-    return NextResponse.json({ tasks });
+    const conversations = await db.getRecentConversations(userId, 30);
+    return NextResponse.json({ conversations: conversations.reverse() });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Internal server error";
     const isMissingEnv = msg.startsWith("Missing env vars");
-    console.error("[api/tasks] error:", error);
+    console.error("[api/conversations] error:", error);
     return NextResponse.json(
       { error: isMissingEnv ? `Server not configured: ${msg}` : "Internal server error" },
       { status: isMissingEnv ? 503 : 500 },

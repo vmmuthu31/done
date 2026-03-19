@@ -9,6 +9,14 @@ export class Database {
     this.supabase = createClient(config.supabase.url, config.supabase.anonKey);
   }
 
+  async updateTaskSteps(taskId: string, steps: TaskStep[]): Promise<void> {
+    const { error } = await this.supabase
+      .from("tasks")
+      .update({ steps, updated_at: new Date().toISOString() })
+      .eq("id", taskId);
+    if (error) throw error;
+  }
+
   async createTask(
     userIdentifier: string,
     originalMessage: string,

@@ -1,13 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AIService } from "@/lib/ai";
 import { Database } from "@/lib/database";
+import { validateConfig } from "@/lib/config";
 import { TaskStep } from "@/lib/types";
 
-const ai = new AIService();
-const db = new Database();
+let ai: AIService | null = null;
+let db: Database | null = null;
+
+function getServices() {
+  const missing = validateConfig();
+  if (missing.length > 0) {
+    throw new Error(`Missing env vars: ${missing.join(", ")}`);
+  }
+  if (!ai) ai = new AIService();
+  if (!db) db = new Database();
+  return { ai, db };
+}
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(userId);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT) return false;
+
+  entry.count += 1;
+  return true;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const { ai, db } = getServices();
+
     const body = await req.json();
     const { message, userId } = body as { message: string; userId: string };
 
@@ -15,6 +47,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "message and userId are required" },
         { status: 400 },
+      );
+    }
+
+    if (!checkRateLimit(userId)) {
+      return NextResponse.json(
+        { error: "Too many messages. Please wait a minute." },
+        { status: 429 },
       );
     }
 
@@ -89,10 +128,12 @@ export async function POST(req: NextRequest) {
     await db.saveConversation(userId, reply, false);
     return NextResponse.json({ reply });
   } catch (error) {
+    const msg = error instanceof Error ? error.message : "Internal server error";
+    const isMissingEnv = msg.startsWith("Missing env vars");
     console.error("[api/chat] error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      { error: isMissingEnv ? `Server not configured: ${msg}` : "Internal server error" },
+      { status: isMissingEnv ? 503 : 500 },
     );
   }
 }
