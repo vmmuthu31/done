@@ -105,13 +105,13 @@ export async function POST(req: NextRequest) {
 
       await db.updateTaskStatus(task.id, "in_progress");
 
-      let reply = `Got it! I've captured: "${parsed.title}"`;
+      let reply = `Got it. Breaking down "${parsed.title}" now.`;
       if (steps.length > 0) {
-        reply += "\n\nHere are the steps:\n";
+        reply += `\n\nHere's your plan:\n`;
         reply += steps.map((s, i) => `${i + 1}. ${s.text}`).join("\n");
-        reply += "\n\nStart with step 1?";
+        reply += `\n\n→ Start with step 1: ${steps[0].text}. Do it now.`;
       } else {
-        reply += "\n\nReady to tackle it?";
+        reply += " Start on it right now — even 5 minutes of action beats perfect planning.";
       }
 
       await db.saveConversation(userId, reply, false);
