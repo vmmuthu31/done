@@ -57,10 +57,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await db.saveConversation(userId, message, true);
+    const isPush = message === "__push__";
+
+    if (!isPush) {
+      await db.saveConversation(userId, message, true);
+    }
 
     const conversationHistory = await db.getRecentConversations(userId);
     const activeTasks = await db.getActiveTasksForUser(userId);
+
+    if (isPush) {
+      const task = activeTasks[0] ?? null;
+      const nextStep = task?.steps?.find((s) => !s.completed);
+      const pushMessage = nextStep
+        ? `Your first action: ${nextStep.text}. Open whatever you need and start right now. Don't plan — just begin.`
+        : task
+          ? `Everything is set up. Dive straight into "${task.task_title}" — start immediately.`
+          : `Your task is locked in. Start the first step right now.`;
+      await db.saveConversation(userId, pushMessage, false);
+      return NextResponse.json({ reply: pushMessage });
+    }
 
     const isCompletion = await ai.detectTaskCompletion(message);
 

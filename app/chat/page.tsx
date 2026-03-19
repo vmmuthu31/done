@@ -122,8 +122,48 @@ export default function ChatPage() {
       const data = await res.json();
       setTasks((prev) => prev.map((t) => (t.id === taskId ? data.task : t)));
     } catch {
-      // non-critical
+      console.log("Response failed");
     }
+  }
+
+  async function callAgent(message: string) {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, userId }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error ?? "Unknown error");
+
+    setMessages((prev) => [
+      ...prev,
+      { id: (Date.now() + 1).toString(), role: "agent", text: data.reply },
+    ]);
+
+    await fetchTasks(userId);
+
+    if (data.taskCreated) {
+      await pushNextStep();
+    }
+
+    return data;
+  }
+
+  async function pushNextStep() {
+    await new Promise((r) => setTimeout(r, 600));
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "__push__", userId }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    setMessages((prev) => [
+      ...prev,
+      { id: (Date.now() + 2).toString(), role: "agent", text: data.reply },
+    ]);
+    await fetchTasks(userId);
   }
 
   async function handleSend(e: FormEvent) {
@@ -137,33 +177,7 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, userId }),
-      });
-
-      const data = await res.json();
-
-      if (res.status === 429) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            role: "agent",
-            text: "⏳ You're sending messages too fast. Please wait a moment.",
-          },
-        ]);
-        return;
-      }
-
-      if (!res.ok) throw new Error(data.error ?? "Unknown error");
-
-      setMessages((prev) => [
-        ...prev,
-        { id: (Date.now() + 1).toString(), role: "agent", text: data.reply },
-      ]);
-      await fetchTasks(userId);
+      await callAgent(text);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -226,7 +240,7 @@ export default function ChatPage() {
                 className="mb-3 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-2 mb-3">
-                  <Circle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <Circle className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
                   <p className="text-sm font-semibold text-slate-900 leading-snug">
                     {task.task_title}
                   </p>
@@ -237,7 +251,7 @@ export default function ChatPage() {
                       <li key={i} className="flex items-center gap-2 group">
                         <button
                           onClick={() => toggleStep(task.id, i)}
-                          className="flex-shrink-0 focus:outline-none"
+                          className="shrink-0 focus:outline-none"
                           aria-label={`Mark step ${i + 1} ${step.completed ? "incomplete" : "complete"}`}
                         >
                           {step.completed ? (
@@ -293,7 +307,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-72 border-r border-slate-100 bg-white flex-shrink-0">
+      <aside className="hidden md:flex flex-col w-72 border-r border-slate-100 bg-white shrink-0">
         <TaskSidebar />
       </aside>
 
@@ -401,7 +415,7 @@ export default function ChatPage() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "agent" && (
-                    <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-xs font-bold text-white mr-2.5 mt-1 flex-shrink-0 shadow-sm">
+                    <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-xs font-bold text-white mr-2.5 mt-1 shrink-0 shadow-sm">
                       D
                     </div>
                   )}
@@ -425,7 +439,7 @@ export default function ChatPage() {
                   exit={{ opacity: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-xs font-bold text-white mr-2.5 mt-1 flex-shrink-0 shadow-sm">
+                  <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-xs font-bold text-white mr-2.5 mt-1 shrink-0 shadow-sm">
                     D
                   </div>
                   <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-tl-sm flex items-center gap-2 shadow-sm">
@@ -457,7 +471,7 @@ export default function ChatPage() {
             <button
               type="submit"
               disabled={loading || !input.trim() || !userId || historyLoading}
-              className="w-8 h-8 bg-slate-900 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+              className="w-8 h-8 bg-slate-900 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 shrink-0"
             >
               <Send className="w-3.5 h-3.5 text-white" />
             </button>
